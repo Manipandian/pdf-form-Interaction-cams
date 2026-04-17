@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    resolveAlias: {
+      canvas: { browser: "./lib/empty.ts" },
+    },
+  },
+  serverExternalPackages: ["@azure-rest/ai-document-intelligence"],
 };
 
 export default nextConfig;
