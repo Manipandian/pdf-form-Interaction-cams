@@ -22,11 +22,14 @@ npm install
 cp .env.example .env.local
 ```
 
-Add your Azure credentials to `.env.local`:
+Add your Azure and Gemini credentials to `.env.local`:
 ```env
 AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
 AZURE_DOCUMENT_INTELLIGENCE_KEY=your-32-character-key-here
+GEMINI_API_KEY=your-gemini-api-key-here
 ```
+
+**Note**: The Gemini API key is optional. If not provided, the system will use standard Azure field extraction without LLM enhancement.
 
 3. **Start development server**
 ```bash
@@ -45,10 +48,12 @@ npm start
 
 ### Core Functionality
 - **AI Form Field Extraction**: Automatically detects and extracts form fields from PDF documents using Azure AI Document Intelligence API
+- **Processing Engine Selection**: User can choose between Azure Document Intelligence or Pure LLM (Gemini) processing via header dropdown
 - **Interactive PDF Viewer**: Renders PDFs with clickable field highlights for navigation between form elements
 - **Dynamic Form Generation**: Creates editable form controls based on AI-detected field types (text, email, number, date, checkbox)
 - **Bidirectional Synchronization**: Real-time coordination where PDF field clicks focus corresponding form inputs and form field focus highlights PDF areas
 - **Field Type Intelligence**: Automatic inference of appropriate input types based on content analysis and contextual clues
+- **LLM Enhancement**: Optional Google Gemini integration for improved field accuracy, semantic understanding, and checkbox grouping
 
 ### User Interface Features
 - **File Upload**: Drag-and-drop interface with progress tracking and file validation
@@ -196,6 +201,68 @@ User Interaction ← Store Action ← Event Handler ← Component Focus ← Fiel
 The bidirectional synchronization required careful state coordination to prevent infinite update loops while maintaining responsive UI performance.
 
 ## Real AI-Based Field Extraction from Scanned Forms
+
+### Processing Engine Options
+
+This application provides **two distinct AI processing approaches** that users can select via the header dropdown:
+
+#### Option 1: Azure Document Intelligence (Default)
+- **Production-grade reliability** with deterministic OCR results
+- **Precise coordinate mapping** for pixel-perfect PDF highlighting
+- **Enterprise-ready** with SLA support and high-volume capability
+- **Optimal for**: Standard forms, production environments, consistent results
+
+#### Option 2: Pure LLM Processing (Gemini)
+- **Advanced semantic understanding** of complex form relationships
+- **Superior grouping** of checkboxes and related field elements
+- **Contextual intelligence** that adapts to various document formats
+- **Optimal for**: Complex layouts, experimental analysis, enhanced field grouping
+
+### Enhanced Dual-AI Processing Pipeline
+
+The default implementation combines both approaches for optimal accuracy:
+
+#### Current Implementation: Hybrid Azure + LLM Processing
+
+```typescript
+PDF → Azure AI Analysis → {
+  keyValuePairs: [],    // Coordinate data
+  markdown: ""          // Structured content
+} → Google Gemini Enhancement → Enhanced Field Array
+```
+
+**Stage 1: Azure Document Intelligence**
+- Extracts raw field coordinates and basic key-value pairs
+- Provides precise bounding box information for UI overlays
+- Generates structured markdown representation of document content
+- Features: `["keyValuePairs"]` with `outputContentFormat: "markdown"`
+
+**Stage 2: Google Gemini LLM Enhancement**
+- Receives both Azure fields (with coordinates) AND markdown content
+- Intelligently maps enhanced/grouped fields to appropriate original coordinates
+- Groups related checkboxes under parent questions (e.g., "(a) Self" → "ATM Card required for: Self")  
+- Improves field type inference and value extraction
+- Provides fallback to original Azure data if LLM processing fails
+
+### User-Selectable Processing Modes
+
+The header dropdown allows users to compare processing approaches:
+
+**Azure Document AI**: Standard OCR with reliable coordinate mapping
+```typescript
+// API call with Azure processing
+formData.append('processingMode', 'azure');
+// → Uses analyzeDocument() → Pure Azure AI results
+```
+
+**With LLM (Gemini)**: AI-enhanced processing with improved grouping
+```typescript  
+// API call with LLM processing
+formData.append('processingMode', 'llm');  
+// → Uses analyzeLLMDocument() → Pure Gemini analysis
+```
+
+This dual-option approach allows users to test both engines and choose the optimal results for their specific document types.
 
 ### Production Processing Pipeline
 

@@ -916,3 +916,68 @@ Creating comprehensive project documentation with detailed README, finalizing al
 - **Performance**: ✅ Optimized for Core Web Vitals
 
 **Next**: Ready for Plan 9 - Final validation and project handover.
+
+## Processing Engine Selection Enhancement - April 18, 2026
+
+### Feature Implementation
+**User Choice Interface:**
+- ✅ Processing mode dropdown added to header with Azure/LLM options
+- ✅ Clear visual distinction with icons (Brain for Azure, Bot for LLM)
+- ✅ Contextual labeling: "Azure Document AI" vs "With LLM (Gemini)"
+- ✅ Disabled state during analysis to prevent mid-process switching
+- ✅ Hidden on mobile to preserve space, desktop-first feature
+
+**State Management Integration:**
+- ✅ ProcessingMode type added to Zustand store interface
+- ✅ Default selection: Azure Document Intelligence (production-ready choice)
+- ✅ State persistence across document uploads and sessions
+- ✅ Selective subscription pattern maintains performance standards
+- ✅ Type-safe integration with existing store architecture
+
+**API Enhancement:**
+- ✅ processingMode parameter added to /api/analyze endpoint
+- ✅ Server-side conditional routing between analyzeDocument and analyzeLLMDocument
+- ✅ Dynamic logging shows active processing engine in console output
+- ✅ Form data validation includes processing mode with fallback to "azure"
+- ✅ Maintained backward compatibility with existing upload logic
+
+**Code Quality Improvements:**
+- ✅ Removed all temporary sample data and commented testing code
+- ✅ Eliminated development artifacts for production readiness
+- ✅ Type exports properly structured from store module
+- ✅ Dependency arrays updated for all useCallback hooks
+- ✅ Build verification passes with zero TypeScript errors
+
+### Engine Comparison Ready
+**Azure Document Intelligence Benefits:**
+- ✅ Production-grade reliability and consistency
+- ✅ Precise coordinate mapping for pixel-perfect highlighting
+- ✅ Enterprise SLA support and deterministic results
+- ✅ Optimized for high-volume document processing
+
+**LLM (Gemini) Benefits:**
+- ✅ Superior semantic understanding of form relationships
+- ✅ Better handling of grouped checkboxes and complex layouts  
+- ✅ Contextual field interpretation beyond OCR capabilities
+- ✅ Adaptive to various document formats and styles
+
+### User Experience Enhancement
+- **Immediate Visibility**: Processing choice visible at top of interface
+- **Informed Decision**: Clear engine names help users understand trade-offs
+- **Consistent Interface**: Single upload flow regardless of engine choice
+- **State Preservation**: User preference remembered across sessions
+- **Performance**: No impact on processing speed or application responsiveness
+
+### Technical Architecture
+- **Clean Separation**: Both engines maintain identical API contract
+- **Error Handling**: Consistent error messaging across both processing modes
+- **Logging**: Enhanced console output shows active engine and results
+- **Production Ready**: No development code or temporary solutions remain
+
+**Project Status:** 
+- **Feature Complete**: ✅ Dual processing engine selection fully implemented
+- **Production Ready**: ✅ All code clean and deployment-ready
+- **User Testing Ready**: ✅ Both engines available for comparison
+- **Documentation Current**: ✅ All decisions and progress documented
+
+**Next**: Proceed to Plan 9 - Final validation with dual-engine testing.

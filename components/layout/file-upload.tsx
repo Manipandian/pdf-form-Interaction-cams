@@ -35,6 +35,7 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
   const setIsAnalyzing = useFormStore(state => state.setIsAnalyzing);
   const setAnalysisError = useFormStore(state => state.setAnalysisError);
   const setFields = useFormStore(state => state.setFields);
+  const processingMode = useFormStore(state => state.processingMode);
   const reset = useFormStore(state => state.reset);
 
   
@@ -80,6 +81,7 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
       // Create form data for file upload
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('processingMode', processingMode);
 
       setUploadProgress(30);
 
@@ -124,7 +126,7 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
       setIsAnalyzing(false);
       setUploadProgress(0);
     }
-  }, [setIsAnalyzing, setAnalysisError, setFields, setUploadProgress]);
+  }, [setIsAnalyzing, setAnalysisError, setFields, setUploadProgress, processingMode]);
 
   /**
    * Handle file processing (validation + upload)

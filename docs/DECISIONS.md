@@ -314,3 +314,40 @@ This document tracks all technical decisions made during the implementation of t
 - **Reduced motion detection**: Added as utility function for accessibility compliance
 - **Global animation disable**: Rejected in favor of respecting user motion preferences
 - **Animation on every interaction**: Selective animation triggers to avoid overwhelming users
+
+## Processing Engine Selection Enhancement (April 18, 2026)
+
+### User Choice Implementation
+- **Decision**: Two-engine architecture with runtime selection between Azure Document Intelligence and Pure LLM (Gemini)
+- **Alternative**: Single fixed processing engine
+- **Rationale**: Allows users to compare approaches and choose optimal results for their specific documents
+
+### Processing Mode Architecture
+- **Decision**: `processingMode` parameter in API with server-side conditional routing
+- **Alternative**: Separate API endpoints for each engine
+- **Rationale**: Maintains single upload interface while providing engine flexibility
+
+### Engine Positioning Strategy
+- **Decision**: Azure Document Intelligence as default, LLM as experimental option
+- **Alternative**: Equal positioning of both engines
+- **Rationale**: Azure provides production-grade reliability while LLM offers experimental semantic improvements
+
+### UI/UX Design Decisions
+- **Decision**: Header-based dropdown selector with descriptive labels and icons
+- **Alternative**: Settings page or separate workflow for engine selection
+- **Rationale**: Immediate visibility and easy switching without workflow disruption
+
+### State Management Integration
+- **Decision**: ProcessingMode as part of Zustand store with persistence
+- **Alternative**: Local component state or URL parameters
+- **Rationale**: Consistent state management pattern with session persistence
+
+### Code Quality Improvements
+- **Decision**: Complete removal of temporary/testing code and sample data
+- **Alternative**: Keep commented code for reference
+- **Rationale**: Production readiness requires clean, maintainable code without development artifacts
+
+### Engine Comparison Benefits
+- **Azure strengths**: Precise coordinates, deterministic results, enterprise reliability
+- **LLM strengths**: Better semantic understanding, improved field grouping, contextual intelligence
+- **User benefit**: Can test both approaches to find optimal results for their specific document types

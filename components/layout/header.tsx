@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Zap } from "lucide-react";
-import { useFormStore } from "@/lib/store";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Zap, Brain, Bot } from "lucide-react";
+import { useFormStore, ProcessingMode } from "@/lib/store";
 import { FileUpload } from "./file-upload";
 import { buttonTap, layoutTransition, sectionReveal, successPulse } from "@/lib/animations";
 
@@ -15,6 +16,8 @@ export function Header() {
   const fields = useFormStore(state => state.fields);
   const isAnalyzing = useFormStore(state => state.isAnalyzing);
   const totalPages = useFormStore(state => state.totalPages);
+  const processingMode = useFormStore(state => state.processingMode);
+  const setProcessingMode = useFormStore(state => state.setProcessingMode);
 
   /**
    * Calculate average confidence score for display
@@ -169,6 +172,37 @@ export function Header() {
           initial="initial"
           animate="animate"
         >
+          {/* Processing Mode Selector */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="hidden sm:block"
+          >
+            <Select 
+              value={processingMode} 
+              onValueChange={(value: ProcessingMode) => setProcessingMode(value)}
+              disabled={isAnalyzing}
+            >
+              <SelectTrigger className="w-44 h-8 text-xs">
+                <SelectValue placeholder="Choose AI Engine" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="azure">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-3 w-3 text-blue-600" />
+                    <span>Azure Document AI</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="llm">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-3 w-3 text-purple-600" />
+                    <span>With LLM (Gemini)</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </motion.div>
+
           {/* Analysis status */}
           <AnimatePresence>
             {isAnalyzing && (

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { PDFField } from "@/lib/types";
 
+export type ProcessingMode = "azure" | "llm";
+
 interface FormState {
   fields: PDFField[];
   activeFieldId: string | null;
@@ -12,6 +14,7 @@ interface FormState {
   totalPages: number;
   pageWidth: number;
   pageHeight: number;
+  processingMode: ProcessingMode;
 }
 
 interface FormActions {
@@ -25,6 +28,7 @@ interface FormActions {
   setCurrentPage: (page: number) => void;
   setTotalPages: (total: number) => void;
   setPageDimensions: (width: number, height: number) => void;
+  setProcessingMode: (mode: ProcessingMode) => void;
   reset: () => void;
 }
 
@@ -41,6 +45,7 @@ const initialState: FormState = {
   totalPages: 0,
   pageWidth: 0,
   pageHeight: 0,
+  processingMode: "azure", // Default to Azure Document Intelligence
 };
 
 export const useFormStore = create<FormStore>((set, get) => ({
@@ -71,6 +76,8 @@ export const useFormStore = create<FormStore>((set, get) => ({
 
   setPageDimensions: (width: number, height: number) =>
     set({ pageWidth: width, pageHeight: height }),
+
+  setProcessingMode: (mode: ProcessingMode) => set({ processingMode: mode }),
 
   reset: () => set(initialState),
 }));
