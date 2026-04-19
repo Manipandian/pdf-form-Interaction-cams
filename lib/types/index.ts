@@ -26,3 +26,15 @@ export interface AnalysisError {
   message: string;
   code: string;
 }
+
+// Utility types for form handling
+export type FieldType = PDFField["type"];
+export type FieldValue = PDFField["value"];
+
+// Pixel coordinates type for UI positioning
+export interface PixelRect {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
