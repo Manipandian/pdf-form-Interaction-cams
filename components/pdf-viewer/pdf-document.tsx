@@ -137,12 +137,6 @@ export function PDFDocument({ fileUrl }: PDFDocumentProps) {
             })}
           </Document>
           
-          {/* Show message if no pages loaded */}
-          {numPages === 0 && (
-            <div className="flex items-center justify-center h-32">
-              <p className="text-muted-foreground">Loading PDF...</p>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </div>

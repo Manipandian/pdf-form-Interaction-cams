@@ -27,8 +27,6 @@ interface FieldWrapperProps {
 }
 
 function FieldWrapper({ children, field, isActive, fieldError }: FieldWrapperProps) {
-  const confidencePercentage = Math.round(field.confidence * 100);
-  
   return (
     <motion.div
       id={`form-field-${field.id}`}
@@ -55,13 +53,6 @@ function FieldWrapper({ children, field, isActive, fieldError }: FieldWrapperPro
         >
           {field.label}
         </Label>
-        <Badge 
-          variant="secondary" 
-          className="text-xs"
-          title={`AI extraction confidence: ${confidencePercentage}%`}
-        >
-          {confidencePercentage}%
-        </Badge>
       </div>
       
       {children}
