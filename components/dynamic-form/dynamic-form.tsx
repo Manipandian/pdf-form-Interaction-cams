@@ -178,7 +178,7 @@ export function DynamicForm() {
                     </div>
                   </div>
                 );
-              }              )}
+              })}
             </form>
           </div>
         </ScrollArea>

@@ -5,10 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Zap, Brain, Bot } from "lucide-react";
+import { FileText, Zap, Brain, Bot, RefreshCw } from "lucide-react";
 import { useFormStore, ProcessingMode } from "@/lib/store";
-import { FileUpload } from "./file-upload";
 import { buttonTap, layoutTransition, sectionReveal, successPulse } from "@/lib/animations";
+
+// Processing mode options data
+const PROCESSING_MODES = [
+  {
+    value: "azure" as ProcessingMode,
+    label: "Azure Document AI",
+    icon: Brain,
+    iconColor: "text-blue-600",
+    description: "Microsoft Azure AI Document Intelligence"
+  },
+  {
+    value: "llm" as ProcessingMode, 
+    label: "With LLM (Gemini)",
+    icon: Bot,
+    iconColor: "text-purple-600",
+    description: "Google Gemini 2.5 Flash with enhanced intelligence"
+  }
+] as const;
 
 export function Header() {
   // Selective subscriptions from Zustand store
@@ -18,6 +35,41 @@ export function Header() {
   const totalPages = useFormStore(state => state.totalPages);
   const processingMode = useFormStore(state => state.processingMode);
   const setProcessingMode = useFormStore(state => state.setProcessingMode);
+  const setAnalyzing = useFormStore(state => state.setIsAnalyzing);
+  const setFields = useFormStore(state => state.setFields);
+  const setError = useFormStore(state => state.setAnalysisError);
+  const reset = useFormStore(state => state.reset);
+
+  /**
+   * Handle processing mode change and trigger re-analysis if file exists
+   */
+  const handleProcessingModeChange = async (value: ProcessingMode) => {
+    setProcessingMode(value);
+    
+    // If we already have a file and fields, trigger re-analysis with new mode
+    if (pdfFile && fields.length > 0) {
+      setAnalyzing(true);
+      setFields([]); // Clear existing fields
+      setError(null); // Clear any existing errors
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', pdfFile);
+        formData.append('processingMode', value);
+
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        setFields(result.fields);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Analysis failed');
+      } finally {
+        setAnalyzing(false);
+      }
+    }
+  };
 
   /**
    * Calculate average confidence score for display
@@ -179,65 +231,32 @@ export function Header() {
             className="hidden sm:block"
           >
             <Select 
-              value={processingMode} 
-              onValueChange={(value: ProcessingMode) => setProcessingMode(value)}
-              disabled={isAnalyzing}
-            >
+                value={processingMode} 
+                onValueChange={handleProcessingModeChange}
+                disabled={isAnalyzing}
+              >
               <SelectTrigger className="w-44 h-8 text-xs">
                 <SelectValue placeholder="Choose AI Engine" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="azure">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-3 w-3 text-blue-600" />
-                    <span>Azure Document AI</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="llm">
-                  <div className="flex items-center gap-2">
-                    <Bot className="h-3 w-3 text-purple-600" />
-                    <span>With LLM (Gemini)</span>
-                  </div>
-                </SelectItem>
+              <SelectContent className="bg-background border shadow-md">
+                {PROCESSING_MODES.map((mode) => {
+                  const IconComponent = mode.icon;
+                  return (
+                    <SelectItem 
+                      key={mode.value} 
+                      value={mode.value}
+                      className="focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="flex items-center gap-2">
+                        <IconComponent className={`h-3 w-3 ${mode.iconColor}`} />
+                        <span>{mode.label}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </motion.div>
-
-          {/* Analysis status */}
-          <AnimatePresence>
-            {isAnalyzing && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <motion.div 
-                  className="w-2 h-2 bg-blue-600 rounded-full"
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.6, 1, 0.6]
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-                <motion.span
-                  animate={{ opacity: [0.7, 1, 0.7] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  Analyzing...
-                </motion.span>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Upload new file button - only show if already have a file */}
           <AnimatePresence>
@@ -248,8 +267,19 @@ export function Header() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
                 whileTap={buttonTap}
+                whileHover={{ scale: 1.02 }}
               >
-                <FileUpload variant="retry" />
+                <Button 
+                  onClick={reset}
+                  disabled={isAnalyzing}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  aria-label="Reset application and try another PDF"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Try Another PDF
+                </Button>
               </motion.div>
             )}
           </AnimatePresence>

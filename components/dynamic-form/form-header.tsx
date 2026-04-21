@@ -1,17 +1,13 @@
 'use client'
 
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { RotateCcw, FileText, Target } from "lucide-react";
+import { FileText, Target } from "lucide-react";
 import { useFormStore } from "@/lib/store";
-import { extractDefaultValues } from "@/lib/validations/form-validation";
-import { useFormContext } from "react-hook-form";
 
 export function FormHeader() {
   const fields = useFormStore(state => state.fields);
-  const { reset } = useFormContext();
 
   /**
    * Calculate average confidence score across all fields
@@ -45,14 +41,6 @@ export function FormHeader() {
     return stats;
   }, [fields]);
 
-  /**
-   * Reset form to AI-extracted default values
-   */
-  const handleResetForm = () => {
-    const defaultValues = extractDefaultValues(fields);
-    reset(defaultValues);
-  };
-
   return (
     <div className="border-b bg-background/50 backdrop-blur-sm">
       <div className="p-4 space-y-4">
@@ -65,18 +53,6 @@ export function FormHeader() {
               {fields.length} field{fields.length !== 1 ? 's' : ''}
             </Badge>
           </div>
-
-          {/* Reset button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetForm}
-            className="gap-2"
-            title="Reset all fields to AI-extracted values"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset
-          </Button>
         </div>
 
         {/* Summary information */}

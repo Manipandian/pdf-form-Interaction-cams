@@ -1,12 +1,10 @@
 'use client'
 
-import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { useFormStore } from "@/lib/store";
 import { fieldFocus, layoutTransition, errorShake } from "@/lib/animations";
 import type { PDFField } from "@/lib/types";
@@ -89,22 +87,6 @@ export function FormFieldRenderer({ field, isActive }: FormFieldRendererProps) {
     setActiveField(null);
   };
 
-  /**
-   * Auto-scroll this field into view when it becomes active
-   * This handles PDF -> Form direction of synchronization
-   */
-  useEffect(() => {
-    if (isActive) {
-      const element = document.getElementById(`form-field-${field.id}`);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        });
-      }
-    }
-  }, [isActive, field.id]);
 
   /**
    * Get field error message from react-hook-form

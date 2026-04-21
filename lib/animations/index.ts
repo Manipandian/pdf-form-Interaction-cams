@@ -169,7 +169,7 @@ export const pulseAnimation = {
 };
 
 /**
- * Field focus animations - enhanced versions of existing ones
+ * Field focus animations - visual-only overlays for Form → PDF highlighting
  */
 export const fieldFocus: Variants = {
   initial: {
@@ -177,22 +177,13 @@ export const fieldFocus: Variants = {
     backgroundColor: "transparent",
     boxShadow: "0 0 0 0 rgba(59, 130, 246, 0)",
   },
-  focused: {
-    borderColor: "#3b82f6",
-    backgroundColor: "rgba(59, 130, 246, 0.05)",
-    boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.1)",
-    transition: {
-      duration: duration.fast,
-      ease: easing.decelerated,
-    },
-  },
   active: {
     borderColor: ["#3b82f6", "#60a5fa", "#3b82f6"],
-    backgroundColor: ["#eff6ff", "#dbeafe", "#eff6ff"],
+    backgroundColor: "transparent",
     boxShadow: [
-      "0 0 0 3px rgba(59, 130, 246, 0.1)",
-      "0 0 0 6px rgba(59, 130, 246, 0.2)",
-      "0 0 0 3px rgba(59, 130, 246, 0.1)",
+      "0 0 0 3px rgba(59, 130, 246, 0.2)",
+      "0 0 0 6px rgba(59, 130, 246, 0.3)",
+      "0 0 0 3px rgba(59, 130, 246, 0.2)",
     ],
     transition: {
       duration: 1.5,

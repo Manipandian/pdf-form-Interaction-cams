@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useFormStore } from "@/lib/store";
 import { PDFDocument } from "@/components/pdf-viewer";
-import { FileUpload } from "./file-upload";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { pageTransitions } from "@/lib/animations";
 
@@ -12,6 +13,7 @@ export function PDFPanel() {
   const isAnalyzing = useFormStore(state => state.isAnalyzing);
   const analysisError = useFormStore(state => state.analysisError);
   const fields = useFormStore(state => state.fields);
+  const reset = useFormStore(state => state.reset);
 
   /**
    * Get current application state
@@ -47,7 +49,7 @@ export function PDFPanel() {
       </div>
     );
   };
-  
+
   const renderPlaceholderState = (title: string, message: string, titleColor: string) => (
     <div className="h-full border rounded-lg flex items-center justify-center p-4">
       <motion.div 
@@ -76,8 +78,18 @@ export function PDFPanel() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          whileHover={{ scale: 1.02 }}
         >
-          <FileUpload variant="retry" />
+          <Button 
+            type="button"
+            onClick={reset}
+            variant="outline" 
+            className="gap-2"
+            aria-label="Reset application and try another PDF"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Try Another PDF
+          </Button>
         </motion.div>
       </motion.div>
     </div>

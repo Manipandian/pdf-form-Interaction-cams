@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, FileText, AlertCircle, RefreshCw } from "lucide-react";
+import { Upload, FileText, AlertCircle } from "lucide-react";
 import { useFormStore } from "@/lib/store";
 import type { PDFField } from "@/lib/types";
 import { 
@@ -15,15 +15,12 @@ import {
 } from "@/lib/animations";
 import { toast } from "sonner";
 
-interface FileUploadProps {
-  variant?: 'default' | 'retry';
-}
 
 // File size and type constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const SUPPORTED_TYPES = ['application/pdf'];
 
-export function FileUpload({ variant = 'default' }: FileUploadProps) {
+export function FileUpload() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +33,6 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
   const setAnalysisError = useFormStore(state => state.setAnalysisError);
   const setFields = useFormStore(state => state.setFields);
   const processingMode = useFormStore(state => state.processingMode);
-  const reset = useFormStore(state => state.reset);
 
   
 
@@ -132,11 +128,6 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
    * Handle file processing (validation + upload)
    */
   const processFile = useCallback(async (file: File) => {
-    // Reset previous state
-    if (variant === 'retry') {
-      reset();
-    }
-
     // Validate file
     const validation = validateFile(file);
     if (!validation.isValid) {
@@ -155,7 +146,7 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
 
     // Upload for analysis
     await uploadFile(file);
-  }, [variant, reset, setPdfFile, setPdfUrl, validateFile, uploadFile]);
+  }, [setPdfFile, setPdfUrl, validateFile, uploadFile]);
 
   /**
    * Handle drag and drop events
@@ -197,42 +188,6 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
     fileInputRef.current?.click();
   }, []);
 
-  // Render different variants
-  if (variant === 'retry') {
-    return (
-      <motion.div
-        whileTap={buttonTap}
-        whileHover={{ scale: 1.02 }}
-      >
-        <Button 
-          onClick={handleUploadClick}
-          disabled={isAnalyzing}
-          variant="outline"
-          className="gap-2"
-        >
-          <motion.div
-            animate={isAnalyzing ? { rotate: 360 } : {}}
-            transition={isAnalyzing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
-          >
-            {isAnalyzing ? (
-              <RefreshCw className="h-4 w-4" />
-            ) : (
-              <Upload className="h-4 w-4" />
-            )}
-          </motion.div>
-          {isAnalyzing ? 'Analyzing...' : 'Try Another PDF'}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf"
-            onChange={handleFileInputChange}
-            className="hidden"
-            aria-label="Select PDF file"
-          />
-        </Button>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div 
@@ -324,11 +279,7 @@ export function FileUpload({ variant = 'default' }: FileUploadProps) {
                 animate={isAnalyzing ? { rotate: 360 } : {}}
                 transition={isAnalyzing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
               >
-                {isAnalyzing ? (
-                  <RefreshCw className="h-4 w-4" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
+                <Upload className="h-4 w-4" />
               </motion.div>
               <motion.span
                 layout
