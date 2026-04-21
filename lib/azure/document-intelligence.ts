@@ -135,25 +135,37 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
 
     for (const pair of keyValuePairs) {
       try {
-        // Skip if missing essential data
-        if (!pair.key?.content || !pair.value?.content) {
+        // Skip if missing key content
+        if (!pair.key?.content) {
           continue;
         }
 
         const label = pair.key.content.trim();
-        const valueContent = pair.value.content.trim();
+        const valueContent = pair.value?.content?.trim() || '';
         
-        // Skip empty values
-        if (!valueContent) {
+        let fieldType: FieldType = 'text';
+        let convertedValue: string | number | boolean = '';
+        let processField = false;
+
+        if (valueContent) {
+          // Standard flow: key-value pair with actual value
+          fieldType = inferFieldType(valueContent);
+          convertedValue = convertValue(valueContent, fieldType);
+          processField = true;
+        } else {
+          const fieldFromContent = extractFieldWithKeyContent(label);
+          fieldType = fieldFromContent.fieldType;
+          convertedValue = fieldFromContent.convertedValue;
+          processField = fieldFromContent.processField;
+        }
+
+        // Only process if we determined it's a valid field
+        if (!processField) {
           continue;
         }
 
-        // Determine field type and convert value
-        const fieldType = inferFieldType(valueContent);
-        const convertedValue = convertValue(valueContent, fieldType);
-
         // Get bounding region (prefer value region, fallback to key region)
-        const boundingRegion = pair.value.boundingRegions?.[0] || pair.key.boundingRegions?.[0];
+        const boundingRegion = pair.value?.boundingRegions?.[0] || pair.key.boundingRegions?.[0];
         
         if (!boundingRegion || !boundingRegion.polygon) {
           continue; // Skip fields without location data
@@ -193,11 +205,56 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
 
     // Validate the result with Zod
     const validatedResult = analysisResultSchema.parse(analysisResult);
-    
     return validatedResult;
 
   } catch (error) {
     console.error("Azure AI Document Intelligence analysis failed:", error);
     throw new Error(`Document analysis failed: ${(error as Error)?.message}`);
   }
+}
+
+
+// Fallback flow: empty form fields captured through key content analysis
+// Since we are using "prebuilt-layout" type, empty form fields won't be captured.
+// This will help us capture some common form fields with coordinates.
+// Once we add custom trained model with form template we don't need a hacky solution like this.
+function extractFieldWithKeyContent(content: string) {
+  const keyContentLower = content.toLowerCase();
+  let fieldType: FieldType = 'text';
+  let convertedValue: string | number | boolean = '';
+  let processField = false;
+  // Check for text field indicators
+  if (keyContentLower.includes('name') || 
+      keyContentLower.includes('city') || 
+      keyContentLower.includes('branch') ||
+      keyContentLower.includes('address') ||
+      keyContentLower.includes('email') ||
+      keyContentLower.includes('phone')) {
+    fieldType = 'text';
+    convertedValue = ''; // Empty default for text fields
+    processField = true;
+  }
+  // Check for number field indicators  
+  else if (keyContentLower.includes('no') || 
+           keyContentLower.includes('code') || 
+           keyContentLower.includes('number') ||
+           keyContentLower.includes('id') ||
+           keyContentLower.includes('amount') ||
+           keyContentLower.includes('pin')) {
+    fieldType = 'number';
+    convertedValue = 0; // Empty default for number fields
+    processField = true;
+  }
+  // Check for checkbox field indicators
+  else if (
+           keyContentLower.includes('check') || 
+           keyContentLower.includes('select') ||
+           keyContentLower.includes('tick') ||
+           keyContentLower.includes('mark')) {
+    fieldType = 'checkbox';
+    convertedValue = false; // Empty default for checkboxes
+    processField = true;
+  }
+
+  return { fieldType, convertedValue, processField };
 }
