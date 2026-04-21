@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, FileText, AlertCircle } from "lucide-react";
 import { useFormStore } from "@/lib/store";
-import type { PDFField } from "@/lib/types";
+import { analyzePDF } from "@/lib/services/pdf-analysis";
 import { 
   cardHover, 
   buttonTap, 
@@ -66,62 +66,29 @@ export function FileUpload() {
   }, []);
 
   /**
-   * Upload file to analysis API
+   * Upload file to analysis API using centralized service
    */
   const uploadFile = useCallback(async (file: File): Promise<void> => {
-    try {
-      setIsAnalyzing(true);
-      setAnalysisError(null);
-      setUploadProgress(10);
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    setUploadProgress(0);
 
-      // Create form data for file upload
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('processingMode', processingMode);
-
-      setUploadProgress(30);
-
-      // Send to analysis API
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
-
-      setUploadProgress(60);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    const result = await analyzePDF({
+      file,
+      processingMode,
+      showToasts: true,
+      onProgress: setUploadProgress,
+      onSuccess: (fields) => {
+        setFields(fields);
+      },
+      onError: (error) => {
+        setAnalysisError(error);
       }
+    });
 
-      const result = await response.json();
-      setUploadProgress(80);
-
-      // Store results in Zustand
-      setFields(result.fields);
-      
-      setUploadProgress(100);
-
-      // Show success toast
-      toast.success(`Analysis complete! Found ${result.fields.length} form fields`, {
-        description: `Confidence: ${Math.round(
-          result.fields.reduce((sum: number, field: PDFField) => sum + field.confidence, 0) / 
-          result.fields.length * 100
-        )}%`
-      });
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      setAnalysisError(errorMessage);
-      
-      // Show error toast
-      toast.error('Analysis failed', {
-        description: errorMessage
-      });
-    } finally {
-      setIsAnalyzing(false);
-      setUploadProgress(0);
-    }
+    // Always cleanup loading state
+    setIsAnalyzing(false);
+    setUploadProgress(0);
   }, [setIsAnalyzing, setAnalysisError, setFields, setUploadProgress, processingMode]);
 
   /**

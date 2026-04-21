@@ -51,7 +51,9 @@ const initialState: FormState = {
 export const useFormStore = create<FormStore>((set, get) => ({
   ...initialState,
 
-  setFields: (fields: PDFField[]) => set({ fields }),
+  setFields: (fields: PDFField[]) => set({ 
+    fields: Array.isArray(fields) ? fields : [] 
+  }),
 
   setActiveField: (id: string | null) => set({ activeFieldId: id }),
 

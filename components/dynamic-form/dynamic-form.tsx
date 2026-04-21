@@ -21,7 +21,7 @@ export function DynamicForm() {
    * Memoized to prevent unnecessary schema rebuilds
    */
   const formSchema = useMemo(() => {
-    return fields.length > 0 ? buildFormSchema(fields) : null;
+    return (fields && Array.isArray(fields) && fields.length > 0) ? buildFormSchema(fields) : null;
   }, [fields]);
 
   /**
@@ -60,10 +60,10 @@ export function DynamicForm() {
       // Update Zustand store with form changes
       Object.entries(values).forEach(([fieldId, value]) => {
         if (value !== undefined) {
-          const currentField = fields.find(f => f.id === fieldId);
-          // Only update if value actually changed to prevent unnecessary updates
+          const currentField = fields?.find(f => f.id === fieldId);
+          // Only update if value actually changed and is a valid type
           if (currentField && currentField.value !== value) {
-            updateFieldValue(fieldId, value);
+            updateFieldValue(fieldId, value as string | number | boolean);
           }
         }
       });
@@ -78,17 +78,18 @@ export function DynamicForm() {
    */
   const lastFieldsLength = useRef(0);
   useEffect(() => {
-    if (fields.length > 0 && fields.length !== lastFieldsLength.current) {
+    const fieldsLength = fields && Array.isArray(fields) ? fields.length : 0;
+    if (fieldsLength > 0 && fieldsLength !== lastFieldsLength.current) {
       setIsResetting(true);
       reset(defaultValues);
-      lastFieldsLength.current = fields.length;
+      lastFieldsLength.current = fieldsLength;
       
       // Clear reset flag after a brief delay
       setTimeout(() => {
         setIsResetting(false);
       }, 100);
     }
-  }, [fields.length, defaultValues, reset]);
+  }, [fields, defaultValues, reset]);
 
   /**
    * Group fields by page number for organized display
@@ -122,7 +123,7 @@ export function DynamicForm() {
   }, [fieldsByPage]);
 
   // Don't render if no fields available
-  if (fields.length === 0) {
+  if (!fields || !Array.isArray(fields) || fields.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center space-y-2">

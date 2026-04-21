@@ -155,8 +155,11 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
     const validatedResult = analysisResultSchema.parse(analysisResult);
     
     return validatedResult;
-
+    
   } catch (error) {
+    if((error as { status: number }).status === 503) {
+      throw new Error("LLM document analysis failed: Service Unavailable");
+    }
     console.error("LLM document intelligence analysis failed:", error);
     throw new Error("LLM document analysis failed");
   }

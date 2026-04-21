@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Zap, Brain, Bot, RefreshCw } from "lucide-react";
 import { useFormStore, ProcessingMode } from "@/lib/store";
 import { buttonTap, layoutTransition, sectionReveal, successPulse } from "@/lib/animations";
+import { analyzePDF } from "@/lib/services/pdf-analysis";
 
 // Processing mode options data
 const PROCESSING_MODES = [
@@ -47,34 +48,33 @@ export function Header() {
     setProcessingMode(value);
     
     // If we already have a file and fields, trigger re-analysis with new mode
-    if (pdfFile && fields.length > 0) {
+    if (pdfFile) {
       setAnalyzing(true);
       setFields([]); // Clear existing fields
       setError(null); // Clear any existing errors
       
-      try {
-        const formData = new FormData();
-        formData.append('file', pdfFile);
-        formData.append('processingMode', value);
+      await analyzePDF({
+        file: pdfFile,
+        processingMode: value,
+        showToasts: false, // Header doesn't show toasts
+        onSuccess: (newFields) => {
+          setFields(newFields);
+        },
+        onError: (error) => {
+          setFields([]); // Ensure fields remains an array even on error
+          setError(error);
+        }
+      });
 
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          body: formData,
-        });
-        const result = await response.json();
-        setFields(result.fields);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Analysis failed');
-      } finally {
-        setAnalyzing(false);
-      }
+      setAnalyzing(false);
     }
   };
 
   /**
    * Calculate average confidence score for display
+   * Defensive check: ensure fields is always an array
    */
-  const averageConfidence = fields.length > 0 
+  const averageConfidence = (fields && Array.isArray(fields) && fields.length > 0)
     ? Math.round(fields.reduce((sum, field) => sum + field.confidence, 0) / fields.length * 100)
     : 0;
 
@@ -176,7 +176,7 @@ export function Header() {
 
           {/* Analysis results - show if fields are detected */}
           <AnimatePresence>
-            {fields.length > 0 && (
+            {fields && Array.isArray(fields) && fields.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -309,7 +309,7 @@ export function Header() {
 
       {/* Mobile analysis results - show below header on small screens */}
       <AnimatePresence>
-        {fields.length > 0 && (
+        {fields && Array.isArray(fields) && fields.length > 0 && (
           <motion.div 
             className="sm:hidden border-t px-4 py-2"
             initial={{ opacity: 0, height: 0 }}
