@@ -9,3 +9,7 @@ export {
   extractDefaultValues,
   validateFieldValue
 } from "./form-validation";
+
+export {
+  getFileValidationStatus
+} from "./file-validation";

@@ -70,8 +70,8 @@ export function buildFormSchema(fields: PDFField[]) {
  * Extract default values from PDF fields for react-hook-form initialization
  * This preserves the AI-extracted values as form defaults
  */
-export function extractDefaultValues(fields: PDFField[]): Record<string, any> {
-  const defaults: Record<string, any> = {};
+export function extractDefaultValues(fields: PDFField[]): Record<string, string | number | boolean> {
+  const defaults: Record<string, string | number | boolean> = {};
   
   for (const field of fields) {
     // Use the AI-extracted value as the default
@@ -86,7 +86,7 @@ export function extractDefaultValues(fields: PDFField[]): Record<string, any> {
  * Used for real-time validation during user input
  */
 export function validateFieldValue(
-  value: any, 
+  value: string | number | boolean, 
   field: PDFField
 ): { isValid: boolean; error?: string } {
   try {

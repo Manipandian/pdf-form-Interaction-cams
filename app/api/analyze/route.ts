@@ -1,55 +1,18 @@
 import { NextRequest } from "next/server";
 import { analyzeDocument, analyzeLLMDocument } from "@/lib/azure";
-
-// File size limit (10MB)
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-// Supported MIME types
-const SUPPORTED_TYPES = ["application/pdf"];
+import { getFileValidationStatus } from "@/lib/validations";
 
 
 export async function POST(request: NextRequest) {
   try {
     // Parse form data
     const formData = await request.formData();
-    const file = formData.get("file");
+    const file = formData.get("file") as File;
     const processingMode = formData.get("processingMode") as string || "azure";
 
-    // Validate file exists
-    if (!file || !(file instanceof File)) {
-      return Response.json(
-        { error: "No file provided. Please upload a PDF file." },
-        { status: 400 }
-      );
-    }
-
-    // Validate file type
-    if (!SUPPORTED_TYPES.includes(file.type)) {
-      return Response.json(
-        { 
-          error: `Invalid file type. Only PDF files are supported. Received: ${file.type}` 
-        },
-        { status: 400 }
-      );
-    }
-
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      const sizeMB = Math.round(file.size / (1024 * 1024) * 100) / 100;
-      return Response.json(
-        { 
-          error: `File size (${sizeMB}MB) exceeds the 10MB limit. Please upload a smaller file.` 
-        },
-        { status: 400 }
-      );
-    }
-
-    // Validate file is not empty
-    if (file.size === 0) {
-      return Response.json(
-        { error: "Empty file provided. Please upload a valid PDF file." },
-        { status: 400 }
-      );
+    const { error, status } = getFileValidationStatus(file);
+    if (error) {
+      return Response.json({ error }, { status });
     }
 
     // Convert file to ArrayBuffer
@@ -59,13 +22,7 @@ export async function POST(request: NextRequest) {
     const result = processingMode === "llm" 
       ? await analyzeLLMDocument(buffer)
       : await analyzeDocument(buffer);
-    
-    console.log("Document analysis completed:", {
-      fileName: file.name,
-      fieldsExtracted: result.fields.length,
-      pages: result.pageCount,
-      processingMode: processingMode === "llm" ? "Pure LLM (Gemini)" : "Azure Document Intelligence"
-    });
+    // const result: AnalysisResult = await new Promise((resolve) => setTimeout(() => resolve(tempResult as AnalysisResult), 3000));
 
     return Response.json(result, {
       headers: {
@@ -78,30 +35,9 @@ export async function POST(request: NextRequest) {
 
     // Handle specific error types
     if (error instanceof Error) {
-      if (error.message.includes("Missing Azure")) {
-        return Response.json(
-          { error: "Service configuration error. Please try again later." },
-          { status: 503 }
-        );
-      }
-
-      if (error.message.includes("timed out")) {
-        return Response.json(
-          { error: "Document analysis timed out. Please try again or use a smaller file." },
-          { status: 408 }
-        );
-      }
-
-      if (error.message.includes("validation")) {
-        return Response.json(
-          { error: "Document analysis produced invalid results. Please try a different file." },
-          { status: 422 }
-        );
-      }
-
       // Generic error with message
       return Response.json(
-        { error: `Analysis failed: ${error.message}` },
+        { error: `${error.message}` },
         { status: 500 }
       );
     }
@@ -138,5 +74,4 @@ export async function DELETE() {
 
 
 
-
- 
+// const tempResult = {"fields":[{"id":"field-1","label":"Post Office","value":"Delhi GPO","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.198,"left":0.278,"width":0.16,"height":0.024}},{"id":"field-2","label":"Date","value":"01/08/19","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.198,"left":0.697,"width":0.196,"height":0.025}},{"id":"field-3","label":"CIF ID","value":321502150,"type":"number","page":1,"confidence":0.95,"normalizedRect":{"top":0.228,"left":0.21,"width":0.297,"height":0.025}},{"id":"field-4","label":"Primary Account ID","value":4458312548,"type":"number","page":1,"confidence":0.95,"normalizedRect":{"top":0.227,"left":0.536,"width":0.357,"height":0.025}},{"id":"field-5","label":"Applicant's First Name","value":"R J Kultheep","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.287,"left":0.28,"width":0.612,"height":0.024}},{"id":"field-6","label":"Applicant's Middle Name","value":"","type":"text","page":1,"confidence":0.9,"normalizedRect":{"top":0.315,"left":0.28,"width":0.612,"height":0.024}},{"id":"field-7","label":"Applicant's Last Name","value":"","type":"text","page":1,"confidence":0.9,"normalizedRect":{"top":0.344,"left":0.28,"width":0.612,"height":0.024}},{"id":"field-8","label":"ATM Card required for","value":true,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.38,"left":0.362,"width":0.026,"height":0.016}},{"id":"field-9","label":"Mobile Number","value":6378951260,"type":"number","page":1,"confidence":0.95,"normalizedRect":{"top":0.435,"left":0.345,"width":0.231,"height":0.024}},{"id":"field-10","label":"PAN Number","value":"FTF8512GM","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.435,"left":0.697,"width":0.198,"height":0.024}},{"id":"field-11","label":"Email ID","value":"kultheeprj@gmail.com","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.463,"left":0.345,"width":0.55,"height":0.024}},{"id":"field-12","label":"Date of Birth(DD-MM-YYYY)","value":"06/03/1976","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.49,"left":0.345,"width":0.231,"height":0.025}},{"id":"field-13","label":"Mother's Maiden Name","value":"Rojina","type":"text","page":1,"confidence":0.95,"normalizedRect":{"top":0.491,"left":0.697,"width":0.198,"height":0.025}},{"id":"field-14","label":"4.a. Instant ATM Card","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.573,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-15","label":"4.b. New Personalized ATM card (or) Replaced Personalized ATM card - Request Type","value":true,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.627,"left":0.814,"width":0.02,"height":0.015}},{"id":"field-16","label":"4.b. Name to be printed on the card","value":"","type":"text","page":1,"confidence":0.9,"normalizedRect":{"top":0.655,"left":0.314,"width":0.462,"height":0.024}},{"id":"field-17","label":"4.c. Replacement with Instant ATM card","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.686,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-18","label":"4.d. ATM card PIN request","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.716,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-19","label":"4.e. ATM card hot-listing/ closure request","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.751,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-20","label":"4.f. Internet Banking and Mobile Banking","value":true,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.789,"left":0.813,"width":0.027,"height":0.017}},{"id":"field-21","label":"4.g. Internet Banking","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.819,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-22","label":"4.h. SMS Banking","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.849,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-23","label":"4.i. Linking of Secondary accounts existing active ATM card","value":false,"type":"checkbox","page":1,"confidence":0.95,"normalizedRect":{"top":0.876,"left":0.814,"width":0.019,"height":0.014}},{"id":"field-24","label":"4.i. Provide SB Account IDs to be linked - 1","value":0,"type":"number","page":1,"confidence":0.9,"normalizedRect":{"top":0.88,"left":0.601,"width":0.177,"height":0.015}},{"id":"field-25","label":"4.i. Provide SB Account IDs to be linked - 2","value":0,"type":"number","page":1,"confidence":0.9,"normalizedRect":{"top":0.898,"left":0.601,"width":0.177,"height":0.015}}],"pageCount":1,"pageWidth":8.5,"pageHeight":11};

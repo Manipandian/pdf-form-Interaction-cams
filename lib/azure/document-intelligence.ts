@@ -106,34 +106,17 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
         features: ["keyValuePairs"]
       }
     });
-    
-    console.log("Initial response from Azure Document Intelligence:", {
-      status: initialResponse.status,
-      headers: initialResponse.headers
-    });
 
     // Check for unexpected response
     if (isUnexpected(initialResponse)) {
-      throw new Error(`Analysis failed: ${initialResponse.body?.error?.message || "Unknown error"}`);
+      throw initialResponse.body?.error;
     }
 
     // Use Azure SDK's long running poller (recommended approach)
-    console.log("Creating long running poller...");
     const poller = getLongRunningPoller(client, initialResponse);
     
-    console.log("Polling until done...");
     const pollerResult = await poller.pollUntilDone();
-    
-    console.log("Polling completed successfully");
     const result: AnalyzeOperationOutput = pollerResult.body as AnalyzeOperationOutput;
-
-    // Log the result structure for debugging
-    console.log("Analysis result structure:", {
-      status: result.status,
-      hasAnalyzeResult: !!result.analyzeResult,
-      pages: result.analyzeResult?.pages?.length || 0,
-      keyValuePairs: result.analyzeResult?.keyValuePairs?.length || 0
-    });
 
     // Extract pages for dimensions
     const pages = result.analyzeResult?.pages || [];
@@ -195,7 +178,7 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
 
         fields.push(field);
       } catch (error) {
-        console.warn(`Skipping field due to error:`, error);
+        console.warn(`Skipping field due to error:`, error, pair);
         // Continue processing other fields
       }
     }
@@ -215,11 +198,6 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
 
   } catch (error) {
     console.error("Azure AI Document Intelligence analysis failed:", error);
-    
-    if (error instanceof Error) {
-      throw new Error(`Document analysis failed: ${error.message}`);
-    }
-    
-    throw new Error("Document analysis failed with unknown error");
+    throw new Error(`Document analysis failed: ${(error as Error)?.message}`);
   }
 }

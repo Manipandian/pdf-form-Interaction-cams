@@ -4,35 +4,8 @@ import { generateFieldId } from "@/lib/utils";
 import { analysisResultSchema } from "@/lib/validations";
 import type { AnalysisResult, PDFField } from "@/lib/types";
 
-/**
- * Pure LLM-based document intelligence using Google Gemini
- * This is a POC to test LLM-only approach vs Azure AI + LLM hybrid
- */
-export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<AnalysisResult> {
-  try {
-    // Check if Gemini API key is configured
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-      throw new Error("Gemini API key not configured for LLM document intelligence");
-    }
-
-    const { GoogleGenerativeAI } = await import("@google/generative-ai");
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
-    // Use Gemini 2.5 Flash for PDF analysis (supports direct PDF processing)
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
-    });
-
-    // Convert ArrayBuffer to base64 for Gemini
-    const uint8Array = new Uint8Array(fileBuffer);
-    const base64String = Buffer.from(uint8Array).toString('base64');
-
-    // Create a generic prompt for any bank form analysis
-    const prompt = `You are an expert document intelligence system. Analyze this scanned banking document and extract every form field with precise coordinates.
-
+// A generic prompt for any bank form analysis
+const PROMPT = `You are an expert document intelligence system. Analyze this scanned banking document and extract every form field with precise coordinates.
 **EXTRACT ALL FORM FIELDS:**
 - Text input fields (names, addresses, descriptions, IDs)
 - Numeric input fields (account numbers, phone numbers, amounts)
@@ -95,11 +68,38 @@ Use normalized coordinates (0.0 to 1.0 scale):
 
 ANALYZE THIS BANK FORM AND RETURN ONLY THE JSON:`;
 
+
+
+/**
+ * Pure LLM-based document intelligence using Google Gemini
+ * This is a POC to test LLM-only approach vs Azure AI
+ */
+export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<AnalysisResult> {
+  try {
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+      throw new Error("Gemini API key not configured for LLM document intelligence");
+    }
+
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    // Use Gemini 2.5 Flash for PDF analysis (supports direct PDF processing)
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    // Convert ArrayBuffer to base64 for Gemini
+    const uint8Array = new Uint8Array(fileBuffer);
+    const base64String = Buffer.from(uint8Array).toString('base64');
+
     console.log("Sending PDF to Gemini LLM for direct analysis...");
-    console.log("PDF size:", fileBuffer.byteLength, "bytes");
 
     const result = await model.generateContent([
-      prompt,
+      PROMPT,
       {
         inlineData: {
           data: base64String,
@@ -109,7 +109,6 @@ ANALYZE THIS BANK FORM AND RETURN ONLY THE JSON:`;
     ]);
 
     const responseText = result.response.text();
-    console.log("Gemini LLM response:", responseText);
 
     // Parse the JSON response
     const llmResult = JSON.parse(responseText);
@@ -124,7 +123,7 @@ ANALYZE THIS BANK FORM AND RETURN ONLY THE JSON:`;
       
       // Log type conversion for debugging
       if (originalType !== normalizedType) {
-        console.log(`Field "${field.label}": type "${originalType}" → "${normalizedType}"`);
+        console.log(`Field "${field.label}": type "${originalType}" → "${normalizedType}", ${field}`);
       }
       
       const enhancedField: PDFField = {
@@ -159,12 +158,7 @@ ANALYZE THIS BANK FORM AND RETURN ONLY THE JSON:`;
 
   } catch (error) {
     console.error("LLM document intelligence analysis failed:", error);
-    
-    if (error instanceof Error) {
-      throw new Error(`LLM document analysis failed: ${error.message}`);
-    }
-    
-    throw new Error("LLM document analysis failed with unknown error");
+    throw new Error("LLM document analysis failed");
   }
 }
 
@@ -218,7 +212,7 @@ function normalizeFieldType(llmType: string, fieldLabel?: string): "text" | "num
 /**
  * Convert value to appropriate type
  */
-function convertValueByType(value: any, type: string): string | number | boolean {
+function convertValueByType(value: PDFField["value"], type: PDFField["type"]): string | number | boolean {
   switch (type) {
     case "number":
       const num = Number(value);
