@@ -19,7 +19,7 @@ export function DashboardLayout() {
   if (!pdfUrl) {
     return (
       <motion.div 
-        className="h-screen flex flex-col"
+        className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/30"
         variants={pageTransitions}
         initial="initial"
         animate="enter"
@@ -35,7 +35,7 @@ export function DashboardLayout() {
 
   return (
     <motion.div 
-      className="h-screen flex flex-col"
+      className="h-screen flex flex-col bg-gradient-to-br from-background via-muted/10 to-secondary/20"
       variants={pageTransitions}
       initial="initial"
       animate="enter"

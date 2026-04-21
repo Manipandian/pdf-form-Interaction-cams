@@ -42,7 +42,7 @@ export function FormHeader() {
   }, [fields]);
 
   return (
-    <div className="border-b bg-background/50 backdrop-blur-sm">
+    <div className="border-b bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm">
       <div className="p-4 space-y-4">
         {/* Header title and stats */}
         <div className="flex items-center justify-between">
@@ -84,7 +84,7 @@ export function FormHeader() {
 
         {/* Confidence warning for low scores */}
         {averageConfidence < 75 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100/80 border border-yellow-200 rounded-lg p-3 shadow-sm">
             <p className="text-sm text-yellow-800">
               <strong>Low AI confidence detected.</strong> Please review the extracted values carefully 
               and make corrections as needed. Consider using a higher quality PDF scan for better results.
@@ -93,7 +93,7 @@ export function FormHeader() {
         )}
 
         {/* Instructions */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100/80 border border-blue-200 rounded-lg p-3 shadow-sm">
           <p className="text-sm text-blue-800">
             <strong>How to use:</strong> Click on form fields to highlight the corresponding area in the PDF, 
             or click on highlighted areas in the PDF to focus the corresponding form field.

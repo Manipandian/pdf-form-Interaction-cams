@@ -35,7 +35,7 @@ export function FormPanel() {
    * Render placeholder for empty/error states
    */
   const renderPlaceholderState = () => (
-    <div className="h-full border rounded-lg flex items-center justify-center p-4">
+    <div className="h-full border rounded-lg bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-sm flex items-center justify-center p-4">
       <motion.div 
         className="text-center text-muted-foreground"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -77,7 +77,7 @@ export function FormPanel() {
             case 'dashboard':
               return (
                 <motion.div 
-                  className="h-full border rounded-lg overflow-hidden"
+                  className="h-full border rounded-lg bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-sm overflow-hidden"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2, duration: 0.3 }}

@@ -89,7 +89,7 @@ export function Header() {
 
   return (
     <motion.header 
-      className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className="border-b bg-gradient-to-r from-card via-card/95 to-card/90 backdrop-blur-md shadow-sm"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -103,15 +103,16 @@ export function Header() {
           animate="animate"
         >
           <motion.div 
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover-bounce"
             whileHover={{ scale: 1.05 }}
             whileTap={buttonTap}
           >
             <motion.div 
-              className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-md"
+              className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-lg"
               whileHover={{ 
                 rotate: 360,
-                backgroundColor: "#2563eb"
+                background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+                scale: 1.1
               }}
               transition={{ duration: 0.3 }}
             >
@@ -235,10 +236,10 @@ export function Header() {
                 onValueChange={handleProcessingModeChange}
                 disabled={isAnalyzing}
               >
-              <SelectTrigger className="w-44 h-8 text-xs">
+              <SelectTrigger className="w-44 h-8 text-xs bg-gradient-to-r from-card to-card/90 border-border hover:border-primary/50 shadow-sm">
                 <SelectValue placeholder="Choose AI Engine" />
               </SelectTrigger>
-              <SelectContent className="bg-background border shadow-md">
+              <SelectContent className="bg-gradient-to-br from-card to-card/95 border shadow-lg backdrop-blur-sm">
                 {PROCESSING_MODES.map((mode) => {
                   const IconComponent = mode.icon;
                   return (
@@ -274,7 +275,7 @@ export function Header() {
                   disabled={isAnalyzing}
                   variant="outline"
                   size="sm"
-                  className="gap-2"
+                  className="gap-2 bg-gradient-to-r from-secondary to-secondary/80 hover:from-accent hover:to-accent/80 border-border hover:border-primary/50 shadow-sm hover:shadow-md transition-all"
                   aria-label="Reset application and try another PDF"
                 >
                   <RefreshCw className="h-4 w-4" />

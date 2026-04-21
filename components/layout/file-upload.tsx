@@ -185,7 +185,16 @@ export function FileUpload() {
                 stiffness: 300,
                 damping: 30
               }}
-              className="border-2 border-dashed rounded-lg p-8 text-center space-y-4 cursor-pointer"
+              className={`
+                border-2 border-dashed rounded-lg p-8 text-center space-y-4 cursor-pointer
+                bg-gradient-to-br from-card to-card/80 backdrop-blur-sm
+                shadow-sm hover:shadow-md border-border
+                transition-all duration-300 ease-in-out
+                ${isDragOver 
+                  ? 'border-primary bg-gradient-to-br from-primary/5 to-primary/10 shadow-lg scale-[1.02]' 
+                  : 'hover:border-primary/50 hover:bg-gradient-to-br hover:from-accent/30 hover:to-accent/10'
+                }
+              `}
               onClick={handleUploadClick}
             >
           {/* Upload icon with enhanced animation */}
@@ -201,9 +210,9 @@ export function FileUpload() {
               damping: 20,
               rotate: isDragOver ? { repeat: Infinity, duration: 0.5 } : {}
             }}
-            className="flex justify-center text-gray-500"
+            className="flex justify-center text-muted-foreground"
           >
-            <Upload className={`h-16 w-16 transition-colors ${isDragOver ? 'text-blue-500' : ''}`} />
+            <Upload className={`h-16 w-16 transition-colors ${isDragOver ? 'text-primary' : ''}`} />
           </motion.div>
 
           {/* Main heading */}

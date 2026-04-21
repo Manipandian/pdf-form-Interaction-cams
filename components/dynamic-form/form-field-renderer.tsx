@@ -28,7 +28,7 @@ function FieldWrapper({ children, field, isActive, fieldError }: FieldWrapperPro
   return (
     <motion.div
       id={`form-field-${field.id}`}
-      className="space-y-2 p-3 rounded-lg border"
+      className="space-y-2 p-3 rounded-lg border bg-gradient-to-br from-card to-card/80 hover:from-accent/20 hover:to-accent/10 shadow-sm hover:shadow-md transition-all"
       variants={fieldFocus}
       initial="initial"
       animate={

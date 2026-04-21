@@ -51,7 +51,7 @@ export function PDFPanel() {
   };
 
   const renderPlaceholderState = (title: string, message: string, titleColor: string) => (
-    <div className="h-full border rounded-lg flex items-center justify-center p-4">
+    <div className="h-full border rounded-lg bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-sm flex items-center justify-center p-4">
       <motion.div 
         className="text-center space-y-4"
         initial={{ opacity: 0, scale: 0.95 }}
