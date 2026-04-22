@@ -59,10 +59,11 @@ npm start
 ### Core AI Processing
 - **Dual AI Engine Support**: Choose between Azure Document Intelligence and Pure LLM (Gemini) processing
 - **Intelligent Field Detection**: Automatic extraction of text, number and checkbox fields
-                         **Note**: Azure Doc might give non form field in keyValue pair becaus of its freetier prebuild-layout model usage
 - **Coordinate-Based Highlighting**: Field positioning with normalized coordinate system
-                           **Note**: In LLM based analysis, Coornidates accuracy varies based on PDF quality
 - **Confidence Scoring**: Real-time AI confidence metrics for extracted data quality
+**Limitations & Trade Offs**: 
+Azure Doc might give non form field in keyValue pair becaus of its freetier prebuild-layout model that is used in this project.
+In LLM based analysis, Coornidates accuracy varies based on PDF quality.
 
 ### Interactive Interface
 - **PDF Synchronization**: Click form fields to highlight PDF

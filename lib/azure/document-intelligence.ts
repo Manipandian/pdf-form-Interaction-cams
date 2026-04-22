@@ -124,9 +124,12 @@ export async function analyzeDocument(fileBuffer: ArrayBuffer): Promise<Analysis
       throw new Error("No pages found in document");
     }
 
+    const STANDARD_PAGE_WIDTH = 8.5;
+    const STANDARD_PAGE_HEIGHT = 11;
+
     const firstPage = pages[0];
-    const pageWidth = firstPage.width || 8.5; // Default to letter size
-    const pageHeight = firstPage.height || 11;
+    const pageWidth = firstPage.width || STANDARD_PAGE_WIDTH; // Default to letter size
+    const pageHeight = firstPage.height || STANDARD_PAGE_HEIGHT;
     const pageCount = pages.length;
 
     // Extract key-value pairs
