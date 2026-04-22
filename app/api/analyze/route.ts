@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Return sanitized error message to client
-    if (error instanceof Error && (error.message.includes('Azure') || error.message.includes('Gemini'))) {
+    if (error instanceof Error && (error.message.includes('Azure') || error.message.includes('Gemini') || error.message.includes('Service Unavailable'))) {
       return Response.json(
         { error: "Document processing service is temporarily unavailable. Please try again later." },
         { status: 503 }
