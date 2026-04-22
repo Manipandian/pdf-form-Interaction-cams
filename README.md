@@ -61,7 +61,7 @@ npm start
 - **Intelligent Field Detection**: Automatic extraction of text, number and checkbox fields
 - **Coordinate-Based Highlighting**: Field positioning with normalized coordinate system
 - **Confidence Scoring**: Real-time AI confidence metrics for extracted data quality
-**Limitations & Trade Offs**: 
+- **Limitations & Trade Offs**: 
 Azure Doc might give non form field in keyValue pair becaus of its freetier prebuild-layout model that is used in this project.
 In LLM based analysis, Coornidates accuracy varies based on PDF quality.
 
