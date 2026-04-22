@@ -157,7 +157,7 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
     
   } catch (error) {
     if((error as { status: number }).status === 503) {
-      throw new Error("LLM document analysis failed: Service Unavailable");
+      throw new Error("LLM document analysis failed: Service Unavailable because of heavy traffic");
     }
     console.error("LLM document intelligence analysis failed:", error);
     throw new Error("LLM document analysis failed");

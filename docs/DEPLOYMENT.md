@@ -19,6 +19,7 @@ All deployment platforms require these environment variables:
 # Required
 AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
 AZURE_DOCUMENT_INTELLIGENCE_KEY=your-32-character-key-here
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
 
 # Optional
 NODE_ENV=production

@@ -59,7 +59,9 @@ npm start
 ### Core AI Processing
 - **Dual AI Engine Support**: Choose between Azure Document Intelligence and Pure LLM (Gemini) processing
 - **Intelligent Field Detection**: Automatic extraction of text, number and checkbox fields
+                         **Note**: Azure Doc might give non form field in keyValue pair becaus of its freetier prebuild-layout model usage
 - **Coordinate-Based Highlighting**: Field positioning with normalized coordinate system
+                           **Note**: In LLM based analysis, Coornidates accuracy varies based on PDF quality
 - **Confidence Scoring**: Real-time AI confidence metrics for extracted data quality
 
 ### Interactive Interface
@@ -110,6 +112,7 @@ npm start
 
 **Cons:**
 - Prebuilt-layout model that i am curretly using has limitations in detecting all field types accurately
+- It blindly find all key value pairs irrespective of whether its a form field or not.
 - Requires manual field type inference based on content patterns
 
 **Production Enhancement**: Custom model training with specific form templates would significantly improve field detection accuracy and type classification.
@@ -126,6 +129,7 @@ npm start
 - Potential for hallucination in sensitive data extraction
 - Less reliable for production-critical applications
 - Requires careful prompt tuning for consistent results
+- Since i am using a free tier version, service unavailablity happens if traffic is too high.
 
 ## State Management Strategy
 
