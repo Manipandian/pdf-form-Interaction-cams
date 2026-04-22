@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { PDFField } from "@/lib/types";
+import { clearFieldSchemaCache } from "@/lib/validations/form-validation";
 
 export type ProcessingMode = "azure" | "llm";
 
@@ -81,7 +82,10 @@ export const useFormStore = create<FormStore>((set, get) => ({
 
   setProcessingMode: (mode: ProcessingMode) => set({ processingMode: mode }),
 
-  reset: () => set(initialState),
+  reset: () => {
+    clearFieldSchemaCache(); // Clear validation cache when resetting
+    set(initialState);
+  },
 }));
 
 /*

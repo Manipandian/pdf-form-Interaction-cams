@@ -61,13 +61,4 @@ export function usePdfScrollSync() {
       }
     };
   }, [activeFieldId, scrollToField]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 }

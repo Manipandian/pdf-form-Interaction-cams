@@ -75,12 +75,11 @@ ANALYZE THIS BANK FORM AND RETURN ONLY THE JSON:`;
  * This is a POC to test LLM-only approach vs Azure AI
  */
 export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<AnalysisResult> {
+  // Check if Gemini API key is configured
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+    throw new Error("Gemini API key not configured for LLM document intelligence");
+  }
   try {
-    // Check if Gemini API key is configured
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-      throw new Error("Gemini API key not configured for LLM document intelligence");
-    }
-
     const { GoogleGenerativeAI } = await import("@google/generative-ai");
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     

@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import type { PDFField } from "@/lib/types";
 import type { ProcessingMode } from "@/lib/store";
+import { clearFieldSchemaCache } from "@/lib/validations/form-validation";
 
 export interface AnalysisOptions {
   file: File;
@@ -30,6 +31,9 @@ export async function analyzePDF({
   onError
 }: AnalysisOptions): Promise<AnalysisResult> {
   try {
+    // Clear any cached validation schemas from previous PDF
+    clearFieldSchemaCache();
+    
     // Progress: Starting analysis
     onProgress?.(10);
 

@@ -50,50 +50,52 @@ export function PDFPanel() {
     );
   };
 
-  const renderPlaceholderState = (title: string, message: string, titleColor: string) => (
-    <div className="h-full border rounded-lg bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-sm flex items-center justify-center p-4">
-      <motion.div 
-        className="text-center space-y-4"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
+  const renderPlaceholderState = (title: string, message: string, titleColor: string) => {
+    return (
+      <div className="h-full border rounded-lg bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-sm flex items-center justify-center p-4">
         <motion.div 
-          className={`${titleColor} text-lg font-semibold`}
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.1 }}
+          className="text-center space-y-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
         >
-          {title}
-        </motion.div>
-        <motion.p 
-          className="text-muted-foreground max-w-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          {message}
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          whileHover={{ scale: 1.02 }}
-        >
-          <Button 
-            type="button"
-            onClick={reset}
-            variant="outline" 
-            className="gap-2"
-            aria-label="Reset application and try another PDF"
+          <motion.div 
+            className={`${titleColor} text-lg font-semibold`}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1 }}
           >
-            <RefreshCw className="h-4 w-4" />
-            Try Another PDF
-          </Button>
+            {title}
+          </motion.div>
+          <motion.p 
+            className="text-muted-foreground max-w-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {message}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Button 
+              type="button"
+              onClick={reset}
+              variant="outline" 
+              className="gap-2"
+              aria-label="Reset application and try another PDF"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Try Another PDF
+            </Button>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </div>
-  );
+      </div>
+    );
+  };
 
   const appState = getAppState();
 

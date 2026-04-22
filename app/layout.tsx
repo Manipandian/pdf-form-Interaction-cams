@@ -15,7 +15,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AI PDF Form Interaction",
-  description: "AI-powered PDF form field extraction and interactive editing",
+  description: "AI-powered PDF form field extraction and interactive editing"
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

@@ -8,8 +8,7 @@ import { HighlightOverlay } from "./highlight-overlay";
 import { usePdfScrollSync } from "./pdf-scroll-sync";
 
 // Configure PDF.js worker for react-pdf v10+
-// Using CDN for production compatibility (no need for local pdfjs-dist dependency)
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // Import required CSS for react-pdf
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -48,7 +47,7 @@ export function PDFDocument({ fileUrl }: PDFDocumentProps) {
    * Handle individual page load success to extract dimensions
    * This is called for each page and helps with coordinate calculations
    */
-  const onPageLoadSuccess = useCallback((page: any) => {
+  const onPageLoadSuccess = useCallback((page: { pageNumber: number; width: number; height: number }) => {
     if (page.pageNumber === 1) {
       // Use first page dimensions for coordinate calculations
       // PDF dimensions are typically in points (72 points = 1 inch)

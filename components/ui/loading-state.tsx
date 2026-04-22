@@ -3,6 +3,29 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Spinner } from "./spinner";
 
+interface LoadingStateProps {
+  /**
+   * Primary loading message
+   */
+  message: string;
+  /**
+   * Secondary descriptive text (optional)
+   */
+  description?: string;
+  /**
+   * Whether to render as an overlay (absolute positioning)
+   */
+  isOverlay?: boolean;
+  /**
+   * Whether the loading state is visible (for overlay mode)
+   */
+  isVisible?: boolean;
+  /**
+   * Additional CSS classes for the container
+   */
+  className?: string;
+}
+
 export function LoadingState({
   message,
   description,
@@ -62,27 +85,4 @@ export function LoadingState({
       {content}
     </div>
   );
-}
-
-interface LoadingStateProps {
-  /**
-   * Primary loading message
-   */
-  message: string;
-  /**
-   * Secondary descriptive text (optional)
-   */
-  description?: string;
-  /**
-   * Whether to render as an overlay (absolute positioning)
-   */
-  isOverlay?: boolean;
-  /**
-   * Whether the loading state is visible (for overlay mode)
-   */
-  isVisible?: boolean;
-  /**
-   * Additional CSS classes for the container
-   */
-  className?: string;
 }
