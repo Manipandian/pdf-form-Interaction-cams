@@ -1,26 +1,11 @@
-export interface NormalizedRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
+import z from "zod";
+import { analysisResultSchema, normalizedRectSchema, pdfFieldSchema } from "../validations/field-schema";
 
-export interface PDFField {
-  id: string;
-  label: string;
-  value: string | number | boolean;
-  type: "text" | "number" | "checkbox";
-  page: number;
-  confidence: number;
-  normalizedRect: NormalizedRect;
-}
+export type NormalizedRect = z.infer<typeof normalizedRectSchema>;
 
-export interface AnalysisResult {
-  fields: PDFField[];
-  pageCount: number;
-  pageWidth: number;
-  pageHeight: number;
-}
+export type PDFField = z.infer<typeof pdfFieldSchema>;
+
+export type AnalysisResult = z.infer<typeof analysisResultSchema>;
 
 export interface AnalysisError {
   message: string;

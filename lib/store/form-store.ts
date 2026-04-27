@@ -13,8 +13,6 @@ interface FormState {
   analysisError: string | null;
   currentPage: number;
   totalPages: number;
-  pageWidth: number;
-  pageHeight: number;
   processingMode: ProcessingMode;
 }
 
@@ -28,7 +26,6 @@ interface FormActions {
   setAnalysisError: (error: string | null) => void;
   setCurrentPage: (page: number) => void;
   setTotalPages: (total: number) => void;
-  setPageDimensions: (width: number, height: number) => void;
   setProcessingMode: (mode: ProcessingMode) => void;
   reset: () => void;
 }
@@ -44,12 +41,10 @@ const initialState: FormState = {
   analysisError: null,
   currentPage: 1,
   totalPages: 0,
-  pageWidth: 0,
-  pageHeight: 0,
   processingMode: "azure", // Default to Azure Document Intelligence
 };
 
-export const useFormStore = create<FormStore>((set, get) => ({
+export const useFormStore = create<FormStore>((set) => ({
   ...initialState,
 
   setFields: (fields: PDFField[]) => set({ 
@@ -76,9 +71,6 @@ export const useFormStore = create<FormStore>((set, get) => ({
   setCurrentPage: (page: number) => set({ currentPage: page }),
 
   setTotalPages: (total: number) => set({ totalPages: total }),
-
-  setPageDimensions: (width: number, height: number) =>
-    set({ pageWidth: width, pageHeight: height }),
 
   setProcessingMode: (mode: ProcessingMode) => set({ processingMode: mode }),
 

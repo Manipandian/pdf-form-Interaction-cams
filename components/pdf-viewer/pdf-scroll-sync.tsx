@@ -24,17 +24,6 @@ export function usePdfScrollSync() {
         block: 'center', // Center the field vertically in the viewport
         inline: 'nearest' // Don't scroll horizontally unless necessary
       });
-
-      // Add pulse effect using CSS class instead of inline styles
-      highlightElement.classList.remove('field-pulse');
-      // Force reflow to restart animation
-      void highlightElement.offsetHeight;
-      highlightElement.classList.add('field-pulse');
-
-      // Remove the class after animation completes
-      setTimeout(() => {
-        highlightElement.classList.remove('field-pulse');
-      }, 500);
     }
   }, []);
 

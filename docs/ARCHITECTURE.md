@@ -121,7 +121,7 @@ graph TD
 
 ## API Integration Architecture
 
-### Server-Only Module (`lib/azure/`)
+### Server-Only Module (`lib/document-intelligence/`)
 
 ```typescript
 // document-intelligence.ts

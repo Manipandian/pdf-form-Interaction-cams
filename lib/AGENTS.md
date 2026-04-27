@@ -1,8 +1,8 @@
 # Lib Module Guidelines
 
 ## Server vs Client Code
-- `lib/azure/` contains server-only code - add `import "server-only"` at top of files
-- Never import from `lib/azure/` in client components
+- `lib/document-intelligence/` contains server-only code - add `import "server-only"` at top of files
+- Never import from `lib/document-intelligence/` in client components
 - `lib/store/` and `lib/types/` are shared between server and client
 - `lib/utils/` contains utility functions for both environments
 

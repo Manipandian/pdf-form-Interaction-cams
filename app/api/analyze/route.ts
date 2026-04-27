@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { analyzeDocument, analyzeLLMDocument } from "@/lib/azure";
+import { analyzeDocument, analyzeLLMDocument } from "@/lib/document-intelligence";
 import { getFileValidationStatus } from "@/lib/validations";
 import type { ProcessingMode } from "@/lib/store";
 

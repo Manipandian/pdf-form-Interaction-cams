@@ -3,6 +3,8 @@ import "server-only";
 import { generateFieldId } from "@/lib/utils";
 import { analysisResultSchema } from "@/lib/validations";
 import type { AnalysisResult, PDFField } from "@/lib/types";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { STANDARD_PAGE_HEIGHT, STANDARD_PAGE_WIDTH } from "@/lib/utils/coordinate-utils";
 
 // A generic prompt for any bank form analysis
 const PROMPT = `You are an expert document intelligence system. Analyze this scanned banking document and extract every form field with precise coordinates.
@@ -80,7 +82,7 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
     throw new Error("Gemini API key not configured for LLM document intelligence");
   }
   try {
-    const { GoogleGenerativeAI } = await import("@google/generative-ai");
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     
     // Use Gemini 2.5 Flash for PDF analysis (supports direct PDF processing)
@@ -124,6 +126,10 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
       if (originalType !== normalizedType) {
         console.log(`Field "${field.label}": type "${originalType}" → "${normalizedType}", ${field}`);
       }
+
+      if(!field.normalizedRect){
+        continue;
+      }
       
       const enhancedField: PDFField = {
         id: field.id || generateFieldId(),
@@ -132,9 +138,7 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
         type: normalizedType,
         page: field.page || 1,
         confidence: field.confidence || 0.8,
-        normalizedRect: field.normalizedRect || {
-          top: 0.5, left: 0.1, width: 0.3, height: 0.03
-        }
+        normalizedRect: field.normalizedRect
       };
       
       fields.push(enhancedField);
@@ -144,8 +148,8 @@ export async function analyzeLLMDocument(fileBuffer: ArrayBuffer): Promise<Analy
     const analysisResult: AnalysisResult = {
       fields,
       pageCount: llmResult.pageCount || 1,
-      pageWidth: llmResult.pageWidth || 8.5,
-      pageHeight: llmResult.pageHeight || 11.0,
+      pageWidth: llmResult.pageWidth || STANDARD_PAGE_WIDTH,
+      pageHeight: llmResult.pageHeight || STANDARD_PAGE_HEIGHT,
     };
 
     console.log(`✅ LLM-only analysis completed: ${fields.length} fields extracted`);

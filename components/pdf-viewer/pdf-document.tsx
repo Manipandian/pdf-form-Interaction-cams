@@ -18,6 +18,8 @@ interface PDFDocumentProps {
   fileUrl: string;
 }
 
+const MIN_PDF_WIDTH = 300;
+
 export function PDFDocument({ fileUrl }: PDFDocumentProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(800);
@@ -26,10 +28,7 @@ export function PDFDocument({ fileUrl }: PDFDocumentProps) {
   // Selective subscriptions from Zustand store for performance
   const fields = useFormStore(state => state.fields);
   const activeFieldId = useFormStore(state => state.activeFieldId);
-  const currentPage = useFormStore(state => state.currentPage);
   const setTotalPages = useFormStore(state => state.setTotalPages);
-  const setCurrentPage = useFormStore(state => state.setCurrentPage);
-  const setPageDimensions = useFormStore(state => state.setPageDimensions);
 
   // Initialize scroll sync hook for auto-scrolling to active fields
   usePdfScrollSync();
@@ -44,27 +43,13 @@ export function PDFDocument({ fileUrl }: PDFDocumentProps) {
   }, [setTotalPages]);
 
   /**
-   * Handle individual page load success to extract dimensions
-   * This is called for each page and helps with coordinate calculations
-   */
-  const onPageLoadSuccess = useCallback((page: { pageNumber: number; width: number; height: number }) => {
-    if (page.pageNumber === 1) {
-      // Use first page dimensions for coordinate calculations
-      // PDF dimensions are typically in points (72 points = 1 inch)
-      const width = page.width / 72; // Convert to inches
-      const height = page.height / 72; // Convert to inches
-      setPageDimensions(width, height);
-    }
-  }, [setPageDimensions]);
-
-  /**
    * Handle container resize to maintain responsive PDF rendering
    */
   useEffect(() => {
     const updateContainerWidth = () => {
       if (containerRef.current) {
-        const width = containerRef.current.clientWidth - 32; // Account for padding
-        setContainerWidth(Math.max(width, 300)); // Minimum width of 300px
+        const width = containerRef.current.clientWidth - 32; // Account for padding( TODO: Need to replace with a dynamic padding using window.getComputedStyle(element))
+        setContainerWidth(Math.max(width, MIN_PDF_WIDTH)); // Minimum width of 300px
       }
     };
 
@@ -115,7 +100,6 @@ export function PDFDocument({ fileUrl }: PDFDocumentProps) {
                   <Page
                     pageNumber={pageNumber}
                     width={containerWidth}
-                    onLoadSuccess={onPageLoadSuccess}
                     className="relative"
                     renderTextLayer={true}
                     renderAnnotationLayer={true}

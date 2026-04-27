@@ -131,9 +131,9 @@ Ready to proceed with Plan 3: Azure AI Document Intelligence Integration.
 Built complete Azure AI Document Intelligence integration with server-side API route, intelligent field extraction, type inference, coordinate transformation, and robust error handling.
 
 ### Files Created/Modified (4 total)
-- `lib/azure/document-intelligence.ts` - Server-only Azure AI service with field extraction
-- `lib/azure/index.ts` - Clean exports for Azure services
-- `lib/azure/AGENTS.md` - Azure module documentation and guidelines
+- `lib/document-intelligence/document-intelligence.ts` - Server-only Azure AI service with field extraction
+- `lib/document-intelligence/index.ts` - Clean exports for Azure services
+- `lib/document-intelligence/AGENTS.md` - Azure module documentation and guidelines
 - `app/api/analyze/route.ts` - POST API route for PDF analysis
 - Updated `app/api/AGENTS.md` - Added detailed API route documentation
 
@@ -1093,7 +1093,7 @@ Addressed multiple critical runtime errors, React anti-patterns, and performance
 Enhanced Azure processing with intelligent fallback mechanisms to handle edge cases where the prebuilt-layout model fails to extract complete field information.
 
 ### Files Modified
-- `lib/azure/document-intelligence.ts` - Added content-based field type detection
+- `lib/document-intelligence/document-intelligence.ts` - Added content-based field type detection
 
 ### Enhancements Added
 - **Empty Field Fallback**: When Azure returns empty values, analyze key content for field type inference
