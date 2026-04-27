@@ -284,12 +284,6 @@ Built complete PDF viewer with multi-page support, interactive highlight overlay
 - Click and keyboard event handling
 - Accessibility attributes (ARIA labels, roles, tabIndex)
 
-**PageNavigation (Navigation Controls):**
-- Previous/next navigation with bounds checking
-- Jump-to-page form with validation
-- Smooth scrolling to specific pages
-- Conditional rendering based on page count
-
 **usePdfScrollSync (Synchronization Hook):**
 - Monitors activeFieldId changes from Zustand
 - Automatic scrolling with configurable delay

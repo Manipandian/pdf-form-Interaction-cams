@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,6 +14,7 @@ export function DynamicForm() {
   // Selective subscriptions from Zustand store for performance
   const fields = useFormStore(state => state.fields);
   const activeFieldId = useFormStore(state => state.activeFieldId);
+  const pdfUrl = useFormStore(state => state.pdfUrl);
   const updateFieldValue = useFormStore(state => state.updateFieldValue);
 
   /**
@@ -44,52 +45,33 @@ export function DynamicForm() {
   const { watch, reset } = form;
 
   /**
-   * Track if we're currently resetting to prevent circular updates
-   */
-  const [isResetting, setIsResetting] = useState(false);
-
-  /**
    * Watch all form values and sync changes back to Zustand store
    * Only sync when not in reset state to prevent infinite loops
    */
   useEffect(() => {
     const subscription = watch((values) => {
-      // Skip updates during reset to prevent infinite loop
-      if (isResetting) return;
       
       // Update Zustand store with form changes
       Object.entries(values).forEach(([fieldId, value]) => {
-        if (value !== undefined) {
-          const currentField = fields?.find(f => f.id === fieldId);
-          // Only update if value actually changed and is a valid type
-          if (currentField && currentField.value !== value) {
-            updateFieldValue(fieldId, value as string | number | boolean);
-          }
-        }
+          updateFieldValue(fieldId, value as string | number | boolean);
       });
     });
 
     return () => subscription.unsubscribe();
-  }, [watch, updateFieldValue, fields, isResetting]);
+  }, [watch, updateFieldValue]);
 
   /**
    * Reset form when new fields are loaded (new PDF analyzed)
    * Use a ref to track the last fields to prevent unnecessary resets
    */
-  const lastFieldsLength = useRef(0);
+  const lastPdfUrl = useRef(pdfUrl);
   useEffect(() => {
-    const fieldsLength = fields && Array.isArray(fields) ? fields.length : 0;
-    if (fieldsLength > 0 && fieldsLength !== lastFieldsLength.current) {
-      setIsResetting(true);
+    if (pdfUrl !== lastPdfUrl.current) {
       reset(defaultValues);
-      lastFieldsLength.current = fieldsLength;
+      lastPdfUrl.current = pdfUrl;
       
-      // Clear reset flag after a brief delay
-      setTimeout(() => {
-        setIsResetting(false);
-      }, 100);
     }
-  }, [fields, defaultValues, reset]);
+  }, [pdfUrl, defaultValues, reset]);
 
   /**
    * Group fields by page number for organized display

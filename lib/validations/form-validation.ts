@@ -42,8 +42,6 @@ function createFieldSchema(field: PDFField): z.ZodTypeAny {
           z.number({
             message: `${field.label} must be a valid number`,
           })
-          .min(-999999999, `${field.label} is too small`)
-          .max(999999999, `${field.label} is too large`)
         );
     
     case "checkbox":
